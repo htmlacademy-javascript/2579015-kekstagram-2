@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
 * Студент: [Аревик Антонян](https://up.htmlacademy.ru/javascript-individual/2/user/2579015).
-* Наставник: `Неизвестно`.
+* Наставник: [Евгения Подопригора](https://htmlacademy.ru/profile/id2387199).
 
 ---
 
