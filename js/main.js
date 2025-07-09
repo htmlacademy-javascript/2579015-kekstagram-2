@@ -1,6 +1,6 @@
 import {getInputData} from './data.js';
-
 import {createPosts} from './posts.js';
+import {renderPosts} from './render-pictures.js';
 
 const {DESCRIPTIONS, MESSAGES, NAMES} = getInputData();
 
@@ -10,4 +10,5 @@ const INPUT_DATA = {
   NAMES: NAMES
 };
 
-createPosts(INPUT_DATA);
+const posts = createPosts(INPUT_DATA);
+renderPosts(posts);

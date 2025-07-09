@@ -3,7 +3,7 @@ function checkStrLength(str, maxLength) {
   return str.length <= maxLength;
 }
 
-checkStrLength();
+checkStrLength('', 0);
 
 /* Функция для проверки, является ли строка палиндромом. Палиндром — это слово или фраза, которые одинаково читаются и слева направо и справа налево.  */
 function isPalindrome(inputStr) {
@@ -20,7 +20,7 @@ function isPalindrome(inputStr) {
   return true;
 }
 
-isPalindrome();
+isPalindrome('');
 
 /* Функция принимает строку, извлекает содержащиеся в ней цифры от 0 до 9 и возвращает их в виде целого положительного числа. Если в строке нет ни одной цифры, функция должна вернуть NaN. */
 function getNumber(str) {
@@ -36,4 +36,4 @@ function getNumber(str) {
   return strNum === '' ? NaN : Number(strNum);
 }
 
-getNumber();
+getNumber('');
