@@ -1,6 +1,10 @@
-const createPicture = (post, pictureTemplate) => {
+import {onClickPictureHandler} from './render-big-picture.js';
+
+// Создание элемента Picture
+const createPicture = (id, post, pictureTemplate) => {
   const newPicture = pictureTemplate.cloneNode(true);
 
+  newPicture.dataset.id = id;
   const image = newPicture.querySelector('.picture__img');
   image.src = post.url;
   image.alt = post.description;
@@ -10,17 +14,27 @@ const createPicture = (post, pictureTemplate) => {
   return newPicture;
 };
 
+// Отрисовка постов
 const renderPosts = (posts) => {
   const pictures = document.querySelector('.pictures');
   const template = document.querySelector('#picture').content.querySelector('.picture');
   const fragment = document.createDocumentFragment();
 
-  posts.forEach((element) => {
-    const pictureItem = createPicture(element, template);
+  posts.forEach((element, index) => {
+    const pictureItem = createPicture(index, element, template);
     fragment.appendChild(pictureItem);
   });
 
   pictures.appendChild(fragment);
+
+  pictures.addEventListener('click', (evt) => {
+    const picture = evt.target.closest('.picture');
+
+    if (picture) {
+      evt.preventDefault();
+      onClickPictureHandler(posts[picture.dataset.id]);
+    }
+  });
 };
 
 export {renderPosts};
