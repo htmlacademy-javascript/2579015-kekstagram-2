@@ -6,6 +6,14 @@ const commentShownCount = bigPicture.querySelector('.social__comment-shown-count
 const commentsContainer = bigPicture.querySelector('.social__comments');
 const buttonClose = bigPicture.querySelector('.big-picture__cancel');
 const buttonDownload = bigPicture.querySelector('.comments-loader');
+const COUNT_ITERATION = 5;
+let currentCount = 0;
+
+// Получить массив комментариев
+const getComments = () => {
+  const commentsNodeList = commentsContainer.querySelectorAll('.social__comment');
+  return Array.from(commentsNodeList);
+};
 
 // Создание элемента комментария
 const createComment = (comment) => {
@@ -37,35 +45,40 @@ const initComments = (comments) => {
 
 // Обновить количество показанных комментариев
 const updateCounterComments = () => {
-  const shownComments = commentsContainer.querySelectorAll('.social__comment:not(.hidden)');
+  const shownComments = getComments().filter((comment) => !comment.classList.contains('hidden'));
   commentShownCount.textContent = shownComments.length;
 };
 
 // Показать комментарии
-const showComments = () => {
-  const comments = commentsContainer.querySelectorAll('.social__comment');
+const showNextComments = () => {
+  const slicedComments = getComments().slice(currentCount, currentCount + COUNT_ITERATION);
 
-  comments.forEach((element) => {
+  slicedComments.forEach((element) => {
     element.classList.remove('hidden');
   });
 
+  currentCount += COUNT_ITERATION;
   updateCounterComments();
+
+  if (currentCount >= getComments().length) {
+    buttonDownload.classList.add('hidden');
+  }
 };
 
 // Открытие окна
 const openBigPicture = () => {
+  currentCount = 0;
   document.body.classList.add('modal-open');
   bigPicture.classList.remove('hidden');
-  buttonDownload.classList.add('hidden');
-  addEventListenerClose();
+  buttonDownload.classList.remove('hidden');
+  addEventListeners();
 };
 
 // Закрытие окна
 const сloseBigPicture = () => {
   document.body.classList.remove('modal-open');
   bigPicture.classList.add('hidden');
-  buttonDownload.classList.remove('hidden');
-  removeEventListenerClose();
+  removeEventListeners();
 };
 
 // Обработчик события нажатия Escape
@@ -82,16 +95,18 @@ const onClickCloseButtonHandler = (evt) => {
   сloseBigPicture();
 };
 
-// Удаление событий закрытия
-function removeEventListenerClose() {
+// Удаление событий
+function removeEventListeners() {
   document.removeEventListener('keydown', onKeydownEscHandler);
   buttonClose.removeEventListener('click', onClickCloseButtonHandler);
+  buttonDownload.removeEventListener('click', showNextComments);
 }
 
-// Добавление событий закрытия
-function addEventListenerClose() {
+// Добавление событий
+function addEventListeners() {
   document.addEventListener('keydown', onKeydownEscHandler);
   buttonClose.addEventListener('click', onClickCloseButtonHandler);
+  buttonDownload.addEventListener('click', showNextComments);
 }
 
 // Обработчик нажатия на миниатюру
@@ -100,12 +115,11 @@ const onClickPictureHandler = (post) => {
 
   bigPictureImage.src = post.url;
   bigPicture.querySelector('.likes-count').textContent = post.likes;
-  commentShownCount.textContent = post.comments.length;
   bigPicture.querySelector('.social__comment-total-count').textContent = post.comments.length;
   bigPicture.querySelector('.social__caption').textContent = post.description;
 
   initComments(post.comments);
-  showComments();
+  showNextComments();
 };
 
 export {onClickPictureHandler};
