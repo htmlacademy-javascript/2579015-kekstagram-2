@@ -53,16 +53,10 @@ function getRandomOneOrTwo(arr) {
   return mixedArr[0] + mixedArr[1];
 }
 
-// Создание элемента разметки с заданным классом и заполненным текстом
-function makeElement(tagName, className, text) {
-  const newElement = document.createElement(tagName);
-  newElement.classList.add(className);
-
-  if(text) {
-    newElement.textContent = text;
-  }
-
-  return newElement;
+// Проверить есть ли дубликаты
+function hasDuplicates(arr) {
+  const uniqueItems = new Set(arr);
+  return uniqueItems.size !== arr.length;
 }
 
-export {getRandomInteger, getUniqueRandomInteger, getRandomItem, getRandomOneOrTwo, makeElement};
+export {getRandomInteger, getUniqueRandomInteger, getRandomItem, getRandomOneOrTwo, hasDuplicates};
