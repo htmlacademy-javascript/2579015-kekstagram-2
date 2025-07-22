@@ -1,5 +1,5 @@
 // Создание элемента разметки с заданным классом и заполненным текстом
-function makeElement(tagName, className, text) {
+export function makeElement(tagName, className, text) {
   const newElement = document.createElement(tagName);
   newElement.classList.add(className);
 
@@ -11,7 +11,7 @@ function makeElement(tagName, className, text) {
 }
 
 // Обработчик события нажатия Escape
-function onKeydownEscHandler (evt, callback) {
+export function onKeydownEscHandler (evt, callback) {
   if (evt.key === 'Escape') {
     evt.preventDefault();
     callback();
@@ -19,19 +19,19 @@ function onKeydownEscHandler (evt, callback) {
 }
 
 // Открытие модального окна
-function openModal(element) {
+export function openModal(element) {
   element.classList.remove('hidden');
   document.body.classList.add('modal-open');
 }
 
 // Закрытие модального окна
-function closeModal(element) {
+export function closeModal(element) {
   element.classList.add('hidden');
   document.body.classList.remove('modal-open');
 }
 
 // Добавление событий
-function addEventListeners(evt, handlersArray) {
+export function addEventListeners(evt, handlersArray) {
   for (const item of handlersArray) {
     if (item.element && item.handler) {
       item.element.addEventListener(evt, item.handler);
@@ -40,7 +40,7 @@ function addEventListeners(evt, handlersArray) {
 }
 
 // Удаление событий
-function removeEventListeners(evt, handlersArray) {
+export function removeEventListeners(evt, handlersArray) {
   for (const item of handlersArray) {
     if (item.element && item.handler) {
       item.element.removeEventListener(evt, item.handler);
@@ -48,4 +48,27 @@ function removeEventListeners(evt, handlersArray) {
   }
 }
 
-export {makeElement, onKeydownEscHandler, openModal, closeModal, addEventListeners, removeEventListeners};
+// Создание слайдера
+export function createSlider(sliderElement, minValue, maxValue, stepValue) {
+  noUiSlider.create(sliderElement, {
+    range: {
+      min: minValue,
+      max: maxValue,
+    },
+    step: stepValue,
+    start: minValue,
+    connect: 'lower'
+  });
+}
+
+// Обновить слайдер
+export function updateOptionsSlider(slider, minValue, maxValue, stepValue) {
+  slider.noUiSlider.updateOptions({
+    range: {
+      min: minValue,
+      max: maxValue,
+    },
+    step: stepValue,
+    start: minValue
+  });
+}
