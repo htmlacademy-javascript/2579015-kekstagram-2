@@ -9,13 +9,10 @@ const buttonDownload = bigPicture.querySelector('.comments-loader');
 const COUNT_ITERATION = 5;
 let currentCount = 0;
 
-const onKeydownHandlers = [
-  { element: document, handler: onKeydownEscBigPictureHandler }
-];
-
-const onClickHandlers = [
-  { element: buttonClose, handler: onClickCloseButtonHandler },
-  { element: buttonDownload, handler: showNextComments}
+const handlers = [
+  { event: 'keydown', element: document, handler: onKeydownEscBigPictureHandler },
+  { event: 'click', element: buttonClose, handler: onClickCloseButtonHandler },
+  { event: 'click', element: buttonDownload, handler: showNextComments}
 ];
 
 // Получить массив комментариев
@@ -79,15 +76,13 @@ const openBigPicture = () => {
   currentCount = 0;
   openModal(bigPicture);
   buttonDownload.classList.remove('hidden');
-  addEventListeners('keydown', onKeydownHandlers);
-  addEventListeners('click', onClickHandlers);
+  addEventListeners(handlers);
 };
 
 // Закрытие окна
 const сloseBigPicture = () => {
   closeModal(bigPicture);
-  removeEventListeners('keydown', onKeydownHandlers);
-  removeEventListeners('click', onClickHandlers);
+  removeEventListeners(handlers);
 };
 
 // Обработчик события нажатия Escape

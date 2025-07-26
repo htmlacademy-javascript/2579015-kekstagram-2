@@ -1,4 +1,4 @@
-import {addEventListeners, createSlider, updateOptionsSlider} from './dom-utils.js';
+import {addEventListeners, removeEventListeners, createSlider, updateOptionsSlider} from './dom-utils.js';
 
 const buttonSmaller = document.querySelector('.scale__control--smaller');
 const buttonBigger = document.querySelector('.scale__control--bigger');
@@ -13,8 +13,8 @@ const MAX_VALUE_SCALE = 100;
 const MIN_VALUE_SCALE = 25;
 
 const clickHandlers = [
-  { element: buttonSmaller, handler: () => addInputScale(-STEP_SCALE)},
-  { element: buttonBigger, handler: () => addInputScale(STEP_SCALE) }
+  { event: 'click', element: buttonSmaller, handler: () => addInputScale(-STEP_SCALE)},
+  { event: 'click', element: buttonBigger, handler: () => addInputScale(STEP_SCALE) }
 ];
 
 const effects = {
@@ -27,7 +27,7 @@ const effects = {
 };
 
 const effectsConfig = {
-  none: { min: null, max: null },
+  none: { min: 0, max: 0 },
   chrome: { min: 0, max: 1, step: 0.1 },
   sepia: { min: 0, max: 1, step: 0.1 },
   marvin: { min: 0, max: 100, step: 1 },
@@ -46,42 +46,67 @@ function addInputScale(step) {
   }
 }
 
-// Скрыть слайдер и сбросить эффект
+// Скрыть слайдер и отключить эффекты
 function resetEffects() {
-  slider.classList.add('hidden');
   sliderContainer.classList.add('hidden');
-  imagePreview.style.filter = 'none';
+
+  effectsList.forEach((effect) => {
+    effect.disabled = true;
+  });
 }
 
-// Получить выбранный эфект
+// Получить выбранный эффект
 function getCheckedEffect() {
   return Array.from(effectsList).find((radio) => radio.checked);
 }
 
-// Добавить обработчики для кнопок scale
-addEventListeners('click', clickHandlers);
-
-// Создаем слайдер
-createSlider(slider, 0, 1, 0.1);
-
 // Обработчик изменения слайдера
-slider.noUiSlider.on('update', () => {
+function onUpdateSliderHandler() {
   inputEffectLevel.value = slider.noUiSlider.get();
   const checkedEffect = getCheckedEffect().value;
   const effectFunc = effects[checkedEffect];
   imagePreview.style.filter = effectFunc(inputEffectLevel.value);
-});
+}
 
-// Обработчик если эффект выбран
-effectsList.forEach((radio) => {
-  radio.addEventListener('change', () => {
-    const effect = radio.value;
-    const config = effectsConfig[effect];
+// Обработчик эффекта
+function onChangeEffectHandler(evt) {
+  const effect = evt.target.value;
+  const config = effectsConfig[effect];
 
-    if (effect === 'none') {
-      resetEffects();
-    } else {
-      updateOptionsSlider(slider, config.min, config.max, config.step);
-    }
+  if (effect === 'none') {
+    resetEffects();
+  }
+
+  updateOptionsSlider(slider, config.min, config.max, config.step);
+}
+
+// Добавить слайдер эффектов
+function addSliderEffects() {
+  // Создаем слайдер
+  createSlider(slider, 0, 1, 0.1);
+  // Добавить обработчики для кнопок scale
+  addEventListeners(clickHandlers);
+  // Добавить обработчик изменения слайдера
+  slider.noUiSlider.on('update', onUpdateSliderHandler);
+  // Добавить обработчики эффектов
+  effectsList.forEach((radio) => {
+    radio.addEventListener('change', onChangeEffectHandler);
   });
-});
+}
+
+// Удалить слайдер эффектов
+function removeSliderEffects() {
+  // Удалить обработчики для кнопок scale
+  removeEventListeners(clickHandlers);
+  // Удалить обработчики эффектов
+  effectsList.forEach((radio) => {
+    radio.removeEventListener('change', onChangeEffectHandler);
+  });
+
+  slider.noUiSlider.destroy();
+  imagePreview.style.filter = 'none';
+  imagePreview.style.transform = 'none';
+}
+
+export {addSliderEffects, removeSliderEffects};
+
