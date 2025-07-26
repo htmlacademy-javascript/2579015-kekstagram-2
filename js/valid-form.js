@@ -1,15 +1,24 @@
+import {sendData} from './api.js';
 import {hasDuplicates} from './utils.js';
 import {onKeydownEscHandler, openModal, closeModal, addEventListeners, removeEventListeners} from './dom-utils.js';
+import {addSliderEffects, removeSliderEffects} from './effects.js';
 
-const form = document.querySelector('.img-upload__overlay');
+const form = document.querySelector('.img-upload__form');
+const overlay = document.querySelector('.img-upload__overlay');
 const inputFile = document.querySelector('.img-upload__input');
 const buttonClose = document.querySelector('.img-upload__cancel');
+const buttonSubmit = document.querySelector('.img-upload__submit');
 const inputHashtags = document.querySelector('.text__hashtags');
 const description = document.querySelector('.text__description');
 
 const DESCRIPTION_REGEXP = /^.{0,140}$/;
 const LIMIT_COUNT_HASHTAG = 5;
 let errorMessage = '';
+
+const buttonSubmitText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Опубликовываю...'
+};
 
 const rules = [
   {
@@ -31,9 +40,10 @@ const rules = [
 ];
 
 const handlers = [
-  { element: document, handler: onKeydownEscFormHandler },
-  { element: inputHashtags, handler: onKeydownEscFieldHandler },
-  { element: description, handler: onKeydownEscFieldHandler }
+  { event: 'click', element: buttonClose, handler: closeForm},
+  { event: 'keydown', element: document, handler: onKeydownEscFormHandler },
+  { event: 'keydown', element: inputHashtags, handler: onKeydownEscFieldHandler },
+  { event: 'keydown', element: description, handler: onKeydownEscFieldHandler }
 ];
 
 const pristine = new Pristine(form, {
@@ -54,19 +64,29 @@ function onKeydownEscFieldHandler(evt) {
 
 // Закрытие формы
 function closeForm () {
-  closeModal(form);
-
-  removeEventListeners('click', [{element: buttonClose, handler: closeForm}]);
-  removeEventListeners('keydown', handlers);
-
-  inputFile.value = '';
+  closeModal(overlay);
+  removeEventListeners(handlers);
+  form.reset();
+  removeSliderEffects();
 }
 
 // Открытие формы
 const openForm = () => {
-  openModal(form);
-  addEventListeners('click', [{element: buttonClose, handler: closeForm}]);
-  addEventListeners('keydown', handlers);
+  openModal(overlay);
+  addEventListeners(handlers);
+  addSliderEffects();
+};
+
+// Заблокировать кнопку отправки формы
+const blockButtonSubmit = () => {
+  buttonSubmit.disabled = true;
+  buttonSubmit.textContent = buttonSubmitText.SENDING;
+};
+
+// Разблокировать кнопку отправки формы
+const unblockButtonSubmit = () => {
+  buttonSubmit.disabled = false;
+  buttonSubmit.textContent = buttonSubmitText.IDLE;
 };
 
 // Проверка хэштегов
@@ -102,8 +122,18 @@ inputFile.addEventListener('change', openForm);
 pristine.addValidator(inputHashtags, checkHashtags, getErrorMessage);
 pristine.addValidator(description, () => DESCRIPTION_REGEXP.test(description.value), 'Длина комментария не может составлять больше 140 символов.');
 
-form.addEventListener('submit', (evt) => {
-  if (!pristine.validate()) {
+const setUserFormSubmit = (onSuccess) => {
+  form.addEventListener('submit', (evt) => {
     evt.preventDefault();
-  }
-});
+
+    if (pristine.validate()) {
+      blockButtonSubmit();
+      const formData = new FormData(evt.target);
+      sendData(formData)
+        .then(onSuccess)
+        .finally(unblockButtonSubmit);
+    }
+  });
+};
+
+setUserFormSubmit(closeForm);
