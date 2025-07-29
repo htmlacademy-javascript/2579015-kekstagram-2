@@ -59,4 +59,4 @@ function hasDuplicates(arr) {
   return uniqueItems.size !== arr.length;
 }
 
-export {getRandomInteger, getUniqueRandomInteger, getRandomItem, getRandomOneOrTwo, hasDuplicates};
+export {getRandomInteger, getUniqueRandomInteger, getRandomItem, shuffleArray, getRandomOneOrTwo, hasDuplicates};
